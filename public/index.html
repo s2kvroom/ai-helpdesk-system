@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Helpdesk Ticket System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>AI Helpdesk Ticket System</h1>
+    <p class="subtitle">Submit a tech issue and get AI troubleshooting help.</p>
+
+    <div class="card">
+      <h2>Create Ticket</h2>
+      <form id="ticketForm">
+        <input type="text" id="name" placeholder="Your name" required />
+
+        <select id="category" required>
+          <option value="">Select Category</option>
+          <option value="Network">Network Issue</option>
+          <option value="Login">Login Issue</option>
+          <option value="Software">Software Crash</option>
+          <option value="Hardware">Hardware Problem</option>
+        </select>
+
+        <select id="priority" required>
+          <option value="">Select Priority</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
+
+        <textarea id="issue" placeholder="Describe the issue..." required></textarea>
+
+        <button type="submit">Submit Ticket</button>
+      </form>
+    </div>
+
+    <div class="top-actions">
+      <button id="clearTickets">Clear All Tickets</button>
+    </div>
+
+    <div class="card">
+      <h2>Tickets</h2>
+      <div id="ticketsContainer"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
