@@ -202,6 +202,127 @@ function escapeHtml(str) {
     .replaceAll(/\n/g, "<br>");
 }
 
+// ✅ Handle Stripe success redirects
+const params = new URLSearchParams(window.location.search);
+const premiumStatus = params.get("premium");
+const paymentStatus = params.get("payment");
+
+if (premiumStatus === "success") {
+  startQueueSimulation(20);
+}
+
+if (paymentStatus === "success") {
+  showSystemMessage(`
+Premium support payment received.
+
+Your premium AI support request has been submitted successfully.
+  `);
+}
+
+// ✅ Waiting room / queue simulation
+function startQueueSimulation(seconds = 20) {
+  removeQueueElements();
+
+  const box = document.createElement("div");
+  box.id = "queueMessage";
+  box.className = "system-message";
+
+  const container = document.querySelector(".container");
+  if (container) {
+    container.insertBefore(box, container.children[1]);
+  }
+
+  let remaining = seconds;
+
+  const interval = setInterval(() => {
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+
+    box.textContent =
+      `Premium support payment received.\n\n` +
+      `Your live support request has been submitted successfully.\n` +
+      `You are now in the waiting room.\n` +
+      `Estimated wait time: ${mins}:${secs.toString().padStart(2, "0")}`;
+
+    if (remaining <= 0) {
+      clearInterval(interval);
+      box.remove();
+      showAgentJoined();
+      showAgentChat();
+      return;
+    }
+
+    remaining--;
+  }, 1000);
+}
+
+// ✅ Agent joined message
+function showAgentJoined() {
+  const existing = document.getElementById("agentJoinedMessage");
+  if (existing) existing.remove();
+
+  const box = document.createElement("div");
+  box.id = "agentJoinedMessage";
+  box.className = "agent-joined-message";
+  box.textContent =
+    "Agent joined chat. A live support representative is now available.";
+
+  const container = document.querySelector(".container");
+  if (container) {
+    container.insertBefore(box, container.children[1]);
+  }
+}
+
+// ✅ Simple fake live chat
+function showAgentChat() {
+  const existing = document.getElementById("agentChatBox");
+  if (existing) existing.remove();
+
+  const box = document.createElement("div");
+  box.id = "agentChatBox";
+  box.className = "agent-chat-box";
+
+  box.innerHTML = `
+    <h3>Live Agent Chat</h3>
+    <div class="chat-message agent-message">
+      <strong>Agent Mia:</strong> Hi, thanks for waiting. I’m here to help you now.
+    </div>
+    <div class="chat-message agent-message">
+      <strong>Agent Mia:</strong> I’ve received your premium support request and I’m reviewing your issue details.
+    </div>
+  `;
+
+  const container = document.querySelector(".container");
+  if (container) {
+    container.insertBefore(box, container.children[2]);
+  }
+}
+
+// ✅ Normal success message
+function showSystemMessage(message) {
+  const existing = document.getElementById("systemMessage");
+  if (existing) existing.remove();
+
+  const box = document.createElement("div");
+  box.id = "systemMessage";
+  box.className = "system-message";
+  box.textContent = message.trim();
+
+  const container = document.querySelector(".container");
+
+  if (container) {
+    container.insertBefore(box, container.children[1]);
+  }
+}
+
+function removeQueueElements() {
+  const ids = ["systemMessage", "queueMessage", "agentJoinedMessage", "agentChatBox"];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+}
+
 loadTickets();
 
 window.updateTicketStatus = updateTicketStatus;

@@ -257,3 +257,58 @@ button:hover {
   color: #10b981;
   font-weight: bold;
 }
+
+
+.system-message {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  white-space: pre-line;
+  font-weight: 600;
+}
+
+
+.system-message {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  white-space: pre-line;
+  font-weight: 600;
+}
+
+.agent-joined-message {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.agent-chat-box {
+  background: #fffdf5;
+  border: 1px solid #dbeafe;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.chat-message {
+  padding: 12px;
+  border-radius: 10px;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+.agent-message {
+  background: #eff6ff;
+  color: #1e3a8a;
+}
