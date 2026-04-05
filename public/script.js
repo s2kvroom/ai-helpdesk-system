@@ -1,6 +1,10 @@
 const ticketForm = document.getElementById("ticketForm");
 const ticketsContainer = document.getElementById("ticketsContainer");
 const clearTicketsBtn = document.getElementById("clearTickets");
+const liveAgentBtn = document.getElementById("liveAgentBtn");
+
+const tabButtons = document.querySelectorAll(".tab-btn");
+const tabContents = document.querySelectorAll(".tab-content");
 
 async function loadTickets() {
   try {
@@ -8,11 +12,15 @@ async function loadTickets() {
     const tickets = await res.json();
     renderTickets(tickets);
   } catch (error) {
-    ticketsContainer.innerHTML = `<p class="empty">Failed to load tickets.</p>`;
+    if (ticketsContainer) {
+      ticketsContainer.innerHTML = `<p class="empty">Failed to load tickets.</p>`;
+    }
   }
 }
 
 function renderTickets(tickets) {
+  if (!ticketsContainer) return;
+
   if (!tickets.length) {
     ticketsContainer.innerHTML = `<p class="empty">No tickets yet.</p>`;
     return;
@@ -55,48 +63,50 @@ function renderTickets(tickets) {
     .join("");
 }
 
-ticketForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
+if (ticketForm) {
+  ticketForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  const name = document.getElementById("name").value.trim();
-  const category = document.getElementById("category").value;
-  const priority = document.getElementById("priority").value;
-  const issue = document.getElementById("issue").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const category = document.getElementById("category").value;
+    const priority = document.getElementById("priority").value;
+    const issue = document.getElementById("issue").value.trim();
 
-  if (!name || !category || !priority || !issue) {
-    alert("Please fill out all fields.");
-    return;
-  }
-
-  const submitBtn = ticketForm.querySelector('button[type="submit"]');
-
-  try {
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Analyzing issue...";
-
-    const res = await fetch("/api/tickets", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ name, category, priority, issue }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Failed to create ticket.");
+    if (!name || !category || !priority || !issue) {
+      alert("Please fill out all fields.");
+      return;
     }
 
-    ticketForm.reset();
-    loadTickets();
-  } catch (error) {
-    alert(error.message);
-  } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit Ticket";
-  }
-});
+    const submitBtn = ticketForm.querySelector('button[type="submit"]');
+
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Analyzing issue...";
+
+      const res = await fetch("/api/tickets", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name, category, priority, issue }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create ticket.");
+      }
+
+      ticketForm.reset();
+      loadTickets();
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit Ticket";
+    }
+  });
+}
 
 async function updateTicketStatus(id, status) {
   try {
@@ -118,24 +128,69 @@ async function updateTicketStatus(id, status) {
   }
 }
 
-clearTicketsBtn.addEventListener("click", async () => {
-  const confirmed = confirm("Are you sure you want to clear all tickets?");
-  if (!confirmed) return;
+if (clearTicketsBtn) {
+  clearTicketsBtn.addEventListener("click", async () => {
+    const confirmed = confirm("Are you sure you want to clear all tickets?");
+    if (!confirmed) return;
 
-  try {
-    const res = await fetch("/api/tickets", {
-      method: "DELETE",
-    });
+    try {
+      const res = await fetch("/api/tickets", {
+        method: "DELETE",
+      });
 
-    if (!res.ok) {
-      throw new Error("Failed to clear tickets.");
+      if (!res.ok) {
+        throw new Error("Failed to clear tickets.");
+      }
+
+      loadTickets();
+    } catch (error) {
+      alert(error.message);
     }
+  });
+}
 
-    loadTickets();
-  } catch (error) {
-    alert(error.message);
-  }
+tabButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    const targetTab = button.dataset.tab;
+
+    tabButtons.forEach((btn) => btn.classList.remove("active"));
+    tabContents.forEach((tab) => tab.classList.remove("active"));
+
+    button.classList.add("active");
+
+    const targetElement = document.getElementById(targetTab);
+    if (targetElement) {
+      targetElement.classList.add("active");
+    }
+  });
 });
+
+if (liveAgentBtn) {
+  liveAgentBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/create-live-agent-checkout-session", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Could not start live agent payment.");
+      }
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Could not start live agent payment.");
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  });
+}
 
 function escapeHtml(str) {
   return String(str)
@@ -148,3 +203,5 @@ function escapeHtml(str) {
 }
 
 loadTickets();
+
+window.updateTicketStatus = updateTicketStatus;

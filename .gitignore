@@ -1,2 +1,8 @@
 node_modules
+.env*.png
 .env
+*.png
+node_modules
+.env
+*.png
+node_modules
