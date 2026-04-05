@@ -11,6 +11,9 @@ const categoryInput = document.getElementById("category");
 const priorityInput = document.getElementById("priority");
 const issueInput = document.getElementById("issue");
 
+const standardTab = document.getElementById("standardTab");
+const premiumTab = document.getElementById("premiumTab");
+
 // Socket globals
 let socket;
 let currentChatId = null;
@@ -33,21 +36,27 @@ function initSocket() {
   }
 }
 
+function activateTab(tabId) {
+  tabButtons.forEach((btn) => btn.classList.remove("active"));
+  tabContents.forEach((tab) => tab.classList.remove("active"));
+
+  const targetButton = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  const targetTab = document.getElementById(tabId);
+
+  if (targetButton) targetButton.classList.add("active");
+  if (targetTab) targetTab.classList.add("active");
+}
+
+function getPremiumContainer() {
+  return premiumTab || document.querySelector(".container");
+}
+
 // ---------------- TAB SWITCHING ----------------
 
 tabButtons.forEach((button) => {
   button.addEventListener("click", () => {
     const targetTab = button.dataset.tab;
-
-    tabButtons.forEach((btn) => btn.classList.remove("active"));
-    tabContents.forEach((tab) => tab.classList.remove("active"));
-
-    button.classList.add("active");
-
-    const targetElement = document.getElementById(targetTab);
-    if (targetElement) {
-      targetElement.classList.add("active");
-    }
+    activateTab(targetTab);
   });
 });
 
@@ -232,15 +241,19 @@ if (liveAgentBtn) {
 const params = new URLSearchParams(window.location.search);
 
 if (params.get("premium") === "success") {
+  activateTab("premiumTab");
   startQueueSimulation(10);
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 if (params.get("payment") === "success") {
+  activateTab("standardTab");
   showSystemMessage(`
 Premium support payment received.
 
 Your premium AI support request has been submitted successfully.
   `);
+  window.history.replaceState({}, document.title, window.location.pathname);
 }
 
 // ---------------- QUEUE ----------------
@@ -254,10 +267,8 @@ function startQueueSimulation(seconds) {
   box.id = "queueMessage";
   box.className = "system-message";
 
-  const container = document.querySelector(".container");
-  if (container) {
-    container.insertBefore(box, container.children[1]);
-  }
+  const container = getPremiumContainer();
+  container.prepend(box);
 
   const interval = setInterval(() => {
     box.textContent =
@@ -280,22 +291,29 @@ function startQueueSimulation(seconds) {
 // ---------------- REAL-TIME CHAT ----------------
 
 async function createLiveChatSession() {
-  const res = await fetch("/api/live-chat-session", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    activateTab("premiumTab");
 
-  const data = await res.json();
-  currentChatId = data.chatId;
+    const res = await fetch("/api/live-chat-session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
 
-  initSocket();
+    const data = await res.json();
+    currentChatId = data.chatId;
 
-  socket.emit("join-room", {
-    chatId: currentChatId,
-    role: "user",
-  });
+    initSocket();
 
-  showAgentChat();
+    socket.emit("join-room", {
+      chatId: currentChatId,
+      role: "user",
+    });
+
+    showAgentChat();
+  } catch (error) {
+    console.error("Live chat session error:", error);
+    showSystemMessage("Could not start live chat session.");
+  }
 }
 
 function showAgentJoined() {
@@ -307,10 +325,8 @@ function showAgentJoined() {
   box.className = "agent-joined-message";
   box.textContent = "Agent joined chat. A live support representative is now available.";
 
-  const container = document.querySelector(".container");
-  if (container) {
-    container.insertBefore(box, container.children[1]);
-  }
+  const container = getPremiumContainer();
+  container.prepend(box);
 }
 
 function showAgentChat() {
@@ -336,10 +352,8 @@ function showAgentChat() {
     </div>
   `;
 
-  const container = document.querySelector(".container");
-  if (container) {
-    container.insertBefore(box, container.children[2]);
-  }
+  const container = getPremiumContainer();
+  container.appendChild(box);
 
   const sendBtn = document.getElementById("sendChatReplyBtn");
   const input = document.getElementById("chatReplyInput");
@@ -400,10 +414,8 @@ function showSystemMessage(message) {
   box.className = "system-message";
   box.textContent = message.trim();
 
-  const container = document.querySelector(".container");
-  if (container) {
-    container.insertBefore(box, container.children[1]);
-  }
+  const container = getPremiumContainer();
+  container.prepend(box);
 }
 
 function removeQueueElements() {
