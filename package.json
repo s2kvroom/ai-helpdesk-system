@@ -1,15 +1,15 @@
 {
   "name": "ai-helpdesk-system",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "AI-powered helpdesk system with ticket management and Stripe premium support",
+  "main": "server.mjs",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.mjs"
   },
-  "keywords": [],
+  "keywords": ["ai", "helpdesk", "node", "express", "stripe", "openai"],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
