@@ -5,6 +5,8 @@ import express from "express";
 import cors from "cors";
 import OpenAI from "openai";
 import Stripe from "stripe";
+import { createServer } from "http";
+import { Server } from "socket.io";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,6 +36,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 // In-memory storage
 let tickets = [];
 let nextId = 1;
+let chatCounter = 1;
 
 // GET tickets
 app.get("/api/tickets", (req, res) => {
@@ -124,7 +127,15 @@ app.delete("/api/tickets", (req, res) => {
 });
 
 //
-// 💳 STRIPE ROUTES (UPDATED FOR LIVE URL)
+// 💬 LIVE CHAT SESSION ROUTE
+//
+app.post("/api/live-chat-session", (req, res) => {
+  const chatId = `chat_${chatCounter++}`;
+  res.json({ chatId });
+});
+
+//
+// 💳 STRIPE ROUTES
 //
 
 // Premium AI
@@ -185,7 +196,45 @@ app.post("/create-live-agent-checkout-session", async (req, res) => {
   }
 });
 
+//
+// 🚀 SOCKET.IO SERVER
+//
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("User connected:", socket.id);
+
+  socket.on("join-room", ({ chatId, role }) => {
+    socket.join(chatId);
+    console.log(`${role} joined room ${chatId}`);
+
+    if (role === "agent") {
+      io.to(chatId).emit("agent-joined", {
+        text: "Agent joined chat. A live support representative is now available.",
+      });
+    }
+  });
+
+  socket.on("chat-message", ({ chatId, sender, text }) => {
+    io.to(chatId).emit("chat-message", {
+      sender,
+      text,
+    });
+  });
+
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+  });
+});
+
 // Start server
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`🚀 Server running on ${APP_URL}`);
 });
