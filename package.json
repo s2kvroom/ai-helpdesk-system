@@ -7,7 +7,14 @@
   "scripts": {
     "start": "node server.mjs"
   },
-  "keywords": ["ai", "helpdesk", "node", "express", "stripe", "openai"],
+  "keywords": [
+    "ai",
+    "helpdesk",
+    "node",
+    "express",
+    "stripe",
+    "openai"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -15,6 +22,8 @@
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "openai": "^6.33.0",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3",
     "stripe": "^22.0.0"
   }
 }
