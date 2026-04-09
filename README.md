@@ -1,16 +1,16 @@
 # AI Helpdesk System
 
-A full-stack AI-powered helpdesk chatbot built using Node.js, Express, and API integration.
+A full-stack AI-powered helpdesk chatbot built using Node.js, Express, and modern API integrations.
 
 ## 🚀 Live Demo
-https://your-live-demo-link-here
+👉 https://ai-helpdesk-system-g4cs.onrender.com
 
 ## 💻 Features
-- Real-time chat interaction
-- AI-powered responses
-- Conversation flow handling
+- AI-powered chat responses
+- Real-time interaction handling
+- Structured conversation flow
 - Responsive user interface
-- Backend API integration
+- Backend API integration with Express
 
 ## 🛠 Tech Stack
 - JavaScript
@@ -19,8 +19,14 @@ https://your-live-demo-link-here
 - OpenAI API
 - Socket.IO
 
-## 📌 Purpose
-This project demonstrates full-stack development, API integration, and real-world debugging through a functional AI chatbot system.
+## 📌 What This Project Demonstrates
+- Full-stack development (frontend + backend)
+- API integration and real-time request handling
+- Debugging and resolving backend errors (HTTP 500, 429)
+- Building interactive, user-focused applications
+
+## 🧠 About This Project
+This project was built to simulate a modern AI-powered helpdesk system, focusing on user interaction, system reliability, and clean UI design. It highlights my ability to design, build, and troubleshoot full-stack applications.
 
 ## 🔗 Connect
 - GitHub: https://github.com/s2kvroom
